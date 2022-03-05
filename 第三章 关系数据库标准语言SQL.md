@@ -195,3 +195,116 @@ DROP INDEX <索引名>;
 
 ## 3.3 数据查询
 
+SQL 提供了 `SELETE` 语句进行数据查询，该语句具有灵活的使用方式和丰富的功能，其一般格式为
+
+```sql
+SELECT [ALL|DISTINCT] <目标列表达式> [,<目标列表达式>] …
+FROM <表名或视图名> [,<表名或视图名>…] | (SELECT语句) [AS] <别名>
+[WHERE <条件表达式>]
+[GROUP BY <列名1> [HAVING <条件表达式>]]
+[ORDER BY <列名2> [ASC | DESC]];
+```
+
+- `SELECT` 子句：指定要显示的属性列
+- `FROM` 子句：指定查询对象（基本表或视图）
+- `WHERE` 子句：指定查询条件
+- `GROUP BY` 子句：对查询结果按指定列的值分组，该属性列值相等的元组为一个组。通常会在每组中作用聚集函数。
+- `HAVING` 短语：只有满足指定条件的组才予以输出
+- `ORDER BY` 子句：对查询结果表按指定列值的升序或降序排序 
+
+以下例子均来源于下图的学生-课程数据库
+
+
+
+### 3.3.1 单表查询
+
+#### 1. 选择表中的若干列
+
+（1）查询指定列
+
+> 例：查询全体学生的学号与姓名
+
+```sql
+SELECT Sno, Sname
+FROM Student; 
+```
+
+（2）查询全部列
+
+> 例：查询全体学生的详细记录
+
+```sql
+SELECT  *
+FROM Student;
+```
+
+（3）查询经过计算的值
+
+> 例：查询全体学生的姓名、出生年份和所在的院系，要求用小写字母表示系名，且使用列别名改变查询结果的列标题
+
+```sql
+SELECT Sname NAME, 'Year of Birth:' BIRTH, 2014-Sage BIRTHDAY, LOWER(Sdept) DEPARTMENT
+FROM Student;
+```
+
+查询结果为：（当前年为2014年）
+
+| NAME |     BIRTH      | BIRTHDAY | **DEPARTMENT** |
+| :--: | :------------: | :------: | :------------: |
+| 李勇 | Year of Birth: |   1994   |       cs       |
+| 刘晨 | Year of Birth: |   1995   |       cs       |
+| 王敏 | Year of Birth: |   1996   |       ma       |
+| 张立 | Year of Birth: |   1995   |       is       |
+
+#### 2. 选择表中的若干元组
+
+（1）消除取值重复的行
+
+> 例：查询选修了课程的学生学号
+
+```sql
+SELECT DISTINCT Sno
+FROM SC; 
+```
+
+（2）查询满足条件的元组
+
+> 例：查询计算机系年龄在20岁以下的学生姓名
+
+```sql
+SELECT Sname
+FROM  Student
+WHERE Sdept = 'CS' AND Sage < 20;
+```
+
+#### 3. `ORDER BY` 子句
+
+> 例：查询全体学生情况，查询结果按所在系的系号升序排列，同一系中的学生按年龄降序排列
+
+```sql
+SELECT  *
+FROM  Student
+ORDER BY Sdept, Sage DESC;  
+```
+
+#### 4. 聚集函数
+
+> 例：计算1号课程的学生平均成绩
+
+```sql
+SELECT AVG(Grade)
+FROM    SC
+WHERE Cno= ' 1 ';
+```
+
+#### 5. `GROUP BY` 子句
+
+> 例：查询平均成绩大于等于90分的学生学号和平均成绩
+
+```sql
+SELECT  Sno, AVG(Grade)
+FROM  SC
+GROUP BY Sno
+HAVING AVG(Grade) >= 90;
+```
+
