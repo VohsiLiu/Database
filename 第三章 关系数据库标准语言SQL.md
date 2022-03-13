@@ -420,3 +420,333 @@ WHERE  EXISTS
 
 ### 3.3.4 集合查询
 
+- 集合操作主要包括并操作 `UNION`、交操作 `INTERSECT` 和差操作 `EXCEPT`
+- 参加集合操作的各查询结果的列数必须相同；对应项的数据类型也必须相同
+
+> 例：查询选修了课程1或者选修了课程2的学生
+
+```sql
+SELECT Sno
+FROM SC
+WHERE Cno = '1'
+UNION
+SELECT Sno
+FROM SC
+WHERE Cno = '2';
+```
+
+> 例：查询计算机科学系的学生与年龄不大于19岁的学生的交集（MySQL目前不支持交操作）
+
+```sql
+SELECT *
+FROM Student
+WHERE Sdept = 'CS' 
+INTERSECT
+SELECT *
+FROM Student
+WHERE Sage <= 19 
+```
+
+实际上就是查询计算机科学系中年龄不大于19岁的学生
+
+```sql
+SELECT *
+FROM Student
+WHERE Sdept = 'CS' AND Sage <= 19;
+```
+
+> 例：查询计算机科学系的学生与年龄不大于19岁的学生的差集（MySQL目前不支持差集操作）
+
+```sql
+SELECT *
+FROM Student
+WHERE Sdept='CS'
+EXCEPT
+SELECT  *
+FROM Student
+WHERE Sage <=19;
+```
+
+实际上是查询计算机科学系中年龄大于19岁的学生
+
+```sql
+SELECT *
+FROM Student
+WHERE Sdept = 'CS' AND Sage > 19;
+```
+
+### 3.3.5 基于派生表的查询
+
+- 子查询不仅可以出现在 `WHERE` 子句中，还可以出现在 `FROM` 子句中，这时子查询生成的临时派生表成为主查询的查询对象
+- 如果子查询中没有聚集函数，派生表可以不指定属性列，子查询 `SELECT` 子句后面的列名为其默认属性
+- 通过 `FROM` 子句生成派生表时，`AS` 关键字可以省略，但必须为派生关系指定一个别名
+
+> 例：找出每个学生超过他自己选修课程平均成绩的课程号
+
+```sql
+SELECT Sno, Cno
+FROM SC, (SELECT Sno, Avg(Grade) 
+          FROM SC
+    		  GROUP BY Sno)
+          AS Avg_sc(avg_sno,avg_grade)
+WHERE SC.Sno = Avg_sc.avg_sno and SC.Grade >= Avg_sc.avg_grade
+```
+
+### 3.3.6 `SELECT` 语句的一般格式
+
+`SELECT` 语句的一般格式为
+
+```sql
+SELECT [All|DISTINCT] <目标表达式> [别名] [,<目标表达式>[别名]]…
+FROM <表名或视图名> [别名] [,<表名或视图名> [别名]] … | (<SELECT>) [AS] <别名>
+[WHERE <条件表达式>]
+[GROUP BY <列名1> [HAVING <条件表达式>]]
+[ORDER BY <列名2> [ASC|DESC]]
+```
+
+- 目标列表达式的可选格式
+  - `*`
+  - `<表名>. *`
+  - `COUNT ([DISTINCT|ALL])`
+  - `<表名或视图名> [别名] [,<表名或视图名> [别名]] …`
+
+- 聚集函数的一般格式
+
+$$
+\left\{
+\begin{aligned}[l]
+& \mathrm{COUNT} \\
+& \mathrm{SUM}\\
+& \mathrm{AVG}\\
+& \mathrm{MAX}\\
+& \mathrm{MIN}
+& \end{aligned}
+\right\} \ ([\mathrm{DISTINCT\,  |\,  ALL}] \ \mbox{<列名>})
+$$
+
+- `WHERE` 子句的条件表达式的可选格式
+
+  1. $$
+     \mbox{<属性列名>} \uptheta\left\{
+     \begin{aligned}[l]
+     & \mbox{<属性列名>} &\\
+     & \mbox{<常量>} \\
+     & [\mathrm{ANY} \, |\, \mathrm{ALL}]\ (\mathrm{SELECT}\, \mbox{语句})
+     \end{aligned}
+     \right\}
+     $$
+
+  2. $$
+     \mbox{<属性列名>} \mathrm{[NOT]\ BETWEEN}\left\{
+     \begin{aligned}[l]
+     & \mbox{<属性列名>} &\\
+     & \mbox{<常量>} \\
+     & (\mathrm{SELECT}\, \mbox{语句})
+     \end{aligned}
+     \right\}
+     \ \mathrm{AND}\  \left\{
+     \begin{aligned}[l]
+     & \mbox{<属性列名>} &\\
+     & \mbox{<常量>} \\
+     & (\mathrm{SELECT}\, \mbox{语句})
+     \end{aligned}
+     \right\}
+     $$
+  
+  3. $$
+     \mbox{<属性列名>} \mathrm{[NOT]\ IN}\left\{
+     \begin{aligned}[l]
+     & (\mbox{<值1> \ [,<值2> …]}) \\
+     
+     & (\mathrm{SELECT}\, \mbox{语句})
+     \end{aligned}
+     \right\}
+     $$
+  
+  4. `<属性列名> [NOT] LIKE <匹配串>`
+  
+  5. `<属性列名> IS [NOT] NULL`
+  
+  6. `[NOT] EXISTS (SELECT语句)`
+  
+  7. $$
+     \mbox{<条件表达式>} \left\{
+     \begin{aligned}[l]
+     &\mathrm{AND}  \\
+     &\mathrm{OR}
+     \end{aligned}
+     \right\}\ \mbox{<条件表达式>} \left( \left\{
+     \begin{aligned}[l]
+     &\mathrm{AND}  \\
+     &\mathrm{OR}
+     \end{aligned}
+     \right\}\mbox{<条件表达式>}… \right)
+     $$
+
+## 3.4 数据更新
+
+### 3.4.1 插入数据
+
+#### 1. 插入元组
+
+插入元组的 `INSERT` 语句的格式为
+
+```sql
+INSERT
+INTO <表名> [(<属性列1>[,<属性列2> …)]
+VALUES (<常量1>[,<常量2>] …);
+```
+
+- 对于`INTO` 子句
+  - 指定要插入数据的表名及属性列
+  - 属性列的顺序可与表定义中的顺序不一致
+  - 没有指定属性列时，表示要插入的是一条完整的元组，且属性列属性与表定义中的顺序一致
+  - 指定部分属性列时，插入的元组在其余属性列上取空值
+
+- 对于 `VALUES` 子句，提供的值的个数和值的类型必须与 `INTO` 子句匹配
+
+> 例：将一个新学生元组插入到 `Student` 表中
+
+```sql
+INSERT
+INTO  Student (Sno,Sname,Ssex,Sdept,Sage)
+VALUES ('201215128','陈冬','男','IS',18);
+```
+
+#### 2. 插入子查询结果
+
+插入子查询结果的 `INSERT` 语句格式为
+
+```sql
+INSERT 
+INTO <表名> [(<属性列1> [,<属性列2>…)]
+子查询;
+```
+
+> 例：对每一个系，求学生的平均年龄，并把结果存入数据库
+
+首先在数据库中建立一个新表，其中一列存放系名，另一列存放相应的学生平均年龄
+
+```sql
+CREATE TABLE Dept_age
+            (Sdept CHAR(15)                         
+             Avg_age SMALLINT)
+```
+
+然后对 `Student` 按系分组求平均年龄，再把系名和平均年龄存入新表中
+
+### 3.4.2 修改数据
+
+修改操作又称为更新操作，其语句的一般格式为
+
+```sql
+UPDATE <表名>
+SET <列名> = <表达式>[,<列名> = <表达式>]…
+[WHERE <条件>];
+```
+
+- 其功能是修改指定表中满足 `WHERE` 子句条件的元组
+- `SET` 子句给出<表达式>的值用于取代相应的属性列
+- 如果省略 `WHERE` 子句，表示要修改表中的所有元组
+
+> 例：将计算机科学系全体学生的成绩置零
+
+```sql
+UPDATE SC
+SET Grade=0
+WHERE Sno IN
+		 (SELETE Sno
+      FROM Student
+      WHERE Sdept = 'CS');
+```
+
+### 3.4.3 删除数据
+
+删除语句的一般格式为
+
+```sql
+DELETE
+FROM <表名>
+[WHERE <条件>];
+```
+
+- `DELETE` 语句的功能是从指定表中删除满足 `WHERE` 子句条件的所有元组
+- 如果省略 `WHERE` 语句则表示删除表中的所有元组，但表的定义仍在字典中
+- `DELETE` 语句删除的是表中的数据，而不是关于表的定义
+
+> 例：删除计算机科学系所有学生的选课记录
+
+```sql
+DELETE
+FROM SC
+WHERE Sno IN
+			(SELETE  Sno
+			FROM  Student
+			WHERE Sdept = 'CS');
+```
+
+## 3.5 空值的处理
+
+- 空值就是“不知道”或“不存在”或“无意义”的值
+- SQL 语言允许某些元组的某些属性在一定情况下取空值，一般有以下几种情况：
+  - 该属性应该有一个值，但目前不知道它的具体值
+  - 该属性不应该有值
+  - 由于某种原因不便于填写
+
+- 空值是一个很特殊的值，含有不确定性。对关系运算带来特殊的问题，需要做特殊的处理
+
+**1.空值的产生**
+
+> 例：向SC表中插入一个元组，学生号是“201215126”，课程号是”1”，成绩为空
+
+```sql
+INSERT INTO SC(Sno,Cno,Grade)
+VALUES('201215126', '1', NULL);   
+```
+
+**2.空值的判断**
+
+> 例：从Student表中找出漏填了数据的学生信息
+
+```sql
+SELECT  *
+FROM Student
+WHERE Sname IS NULL OR Ssex IS NULL OR Sage IS NULL OR Sdept IS NULL;
+```
+
+**3.空值的约束条件**
+
+属性定义（或者域定义）中有 `NOT NULL` 约束条件的不能取空值，加了 `UNIQUE` 限制的属性不能取空值，码属性不能取空值
+
+**4.空值的算数运算、比较运算和逻辑运算**
+
+- 空值与另一个值（包括另一个空值）的算术运算的结果为空值
+
+- 空值与另一个值（包括另一个空值）的比较运算的结果为 `UNKNOWN`
+
+- 有 `UNKNOWN` 后，传统二值（`TRUE`，`FALSE`）逻辑就扩展成了三值逻辑
+
+<img src="https://typora-vohsiliu.oss-cn-hangzhou.aliyuncs.com/202203131058028.png" alt="3.5.4" style="zoom:26%;" />
+
+- 在查询语句中，只有使 `WHERE` 和 `HAVING` 子句的选择条件为 `TRUE` 的元组才被选出作为输出结果
+
+> 例：选出选修1号课程的不及格的学生以及缺考的学生
+
+```sql
+SELECT Sno
+FROM SC
+WHERE Cno = '1' AND (Grade < 60 OR Grade IS NULL);
+
+/*或者*/
+
+SELECT Sno
+FROM SC
+WHERE Grade < 60 AND Cno = '1'
+UNION
+SELECT Sno
+FROM SC
+WHERE Grade IS NULL AND Cno = '1'
+```
+
+## 3.6 视图
+
