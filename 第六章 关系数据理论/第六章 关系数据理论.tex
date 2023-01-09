@@ -1,0 +1,149 @@
+\documentclass[cs4size,a4paper,10pt]{ctexart}   
+
+\linespread{1.5}
+\usepackage{geometry}%用于设置上下左右页边距
+	\geometry{left=2.5cm,right=2.5cm,top=3.2cm,bottom=2.7cm}
+\usepackage{xeCJK,amsmath,paralist,enumerate,booktabs,multirow,graphicx,subfig,setspace,listings,lastpage,hyperref}
+\usepackage{amsthm, amssymb, bm, color, framed, graphicx, hyperref, mathrsfs}
+\usepackage{mathrsfs}  
+	\setlength{\parindent}{2em}
+	\lstset{language=Matlab}%
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{subfloat}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{paralist}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{autobreak}
+\usepackage{multicol}
+\usepackage{subfig}
+\usepackage{unicode-math}
+\usepackage{ltxtable, filecontents}
+\usepackage{array}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=black,
+	urlcolor=black
+}
+
+\setenumerate{partopsep=0pt,topsep=0pt}
+\setitemize{itemsep=0pt,partopsep=0pt,topsep=0pt}
+
+\titlespacing*{\section}{0pt}{3pt}{3pt}
+\titlespacing*{\subsection}{0pt}{2pt}{2pt}
+\titlespacing*{\subsubsection}{0pt}{1pt}{1pt}
+\titlespacing*{\paragraph}{0pt}{0pt}{0pt}
+
+\ctexset{secnumdepth=4,tocdepth=4}
+\setlength{\parindent}{0pt}
+\setstretch{1.2}
+
+
+\setCJKmainfont[BoldFont={FZHei-B01},ItalicFont={FZKai-Z03}]{FZShuSong-Z01} 
+\setCJKsansfont[BoldFont={FZHei-B01}]{FZKai-Z03} 
+\setCJKmonofont[BoldFont={FZHei-B01}]{FZFangSong-Z02}
+\setCJKfamilyfont{zhsong}{FZShuSong-Z01} 
+\setCJKfamilyfont{zhhei}{FZHei-B01} 
+\setCJKfamilyfont{zhkai}[BoldFont={FZHei-B01}]{FZKai-Z03} 
+\setCJKfamilyfont{zhfs}[BoldFont={FZHei-B01}]{FZFangSong-Z02} 
+\renewcommand*{\songti}{\CJKfamily{zhsong}} 
+\renewcommand*{\heiti}{\CJKfamily{zhhei}} 
+\renewcommand*{\kaishu}{\CJKfamily{zhkai}} 
+\renewcommand*{\fangsong}{\CJKfamily{zhfs}}
+
+
+\definecolor{mKeyword}{RGB}{0,0,255}          % bule
+\definecolor{mString}{RGB}{160,32,240}        % purple
+\definecolor{mComment}{RGB}{34,139,34}        % green
+\definecolor{mNumber}{RGB}{128,128,128} 
+
+\lstdefinestyle {njulisting} {
+	basewidth = 0.5 em,
+	lineskip = 3 pt,
+	basicstyle = \small\ttfamily,
+	% keywordstyle = \bfseries,
+	commentstyle = \itshape\color{gray}, 
+	basicstyle=\small\ttfamily,
+	keywordstyle={\color{black}},     % sets color for keywords
+	stringstyle={\color{black}},       % sets color for strings
+	commentstyle={\color{black}},     % sets color for comments
+	numberstyle=\tiny\color{black},
+	numbers = left,
+	captionpos = t,
+	breaklines = true,
+	xleftmargin = 1 em,
+	xrightmargin = 0 em,
+	frame=tlrb,
+	tabsize=4,
+	aboveskip = 7 pt, %与代码环境上一行的垂直间距
+    belowskip = -2 pt %与代码环境下一行的垂直间距
+}
+
+\lstset{
+style = njulisting, % 调用上述样式 
+flexiblecolumns % 允许调整字符宽度
+}
+
+\newcommand \sverb {\ \verb}
+
+%================= 基本格式预置 ===========================
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{数据管理基础}
+\rhead{关系数据理论}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\theenumi}{(\arabic{enumi})}
+\CTEXsetup[format={\bfseries\zihao{-3}}]{section}
+\CTEXsetup[format={\bfseries\zihao{4}}]{subsection}
+\CTEXsetup[format={\bfseries\zihao{-4}}]{subsubsection}
+
+
+\renewcommand{\contentsname}{目录}  
+\begin{document}
+
+	\begin{center}
+		{\huge\textbf{第六章\ 关系数据理论}}
+	\end{center}
+	%---------目录---------% 
+	\pagenumbering{Roman}
+	\tableofcontents
+	\clearpage
+
+ 	%---------正文---------% 
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+	\setlength{\parskip}{0.65em}
+
+	\setlength\abovedisplayskip{5pt}
+	\setlength\belowdisplayskip{5pt}
+
+	\input{关系数据理论.tex}
+	
+	% \begin{figure}[H]
+    % \vspace{-0.5em}
+	% \centering
+	% \includegraphics[width=0.4\textwidth]{images/}
+    % \vspace{-1em}
+	% \end{figure}
+
+	% \vspace{-0.8em}
+	% \begin{multicols}{2}
+    % \begin{itemize}
+    %     \item 
+    % \end{itemize}
+	% \end{multicols}
+	% \vspace{-1em}
+
+
+\end{document}
+
+
